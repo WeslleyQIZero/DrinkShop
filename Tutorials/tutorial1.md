@@ -414,7 +414,7 @@ public abstract class IDrinkShopAPI {
     abstract Call<User> registerNewUser(@Field("phone") String phone,
                                         @Field("name") String name,
                                         @Field("address") String address,
-                                        @Field("birthdate") String birthdate);
+                                        @Field("birthday") String birthdate);
 }
 
 ~~~~
@@ -477,8 +477,8 @@ import com.example.olgun.drinkshop.Retrofit.IDrinkShopAPI;
 import com.example.olgun.drinkshop.Retrofit.RetrofitClient;
 
 public class Common {
-    //In Emulator, localhost = 10.2.2.2
-    private static final String BASE_URL = "http://localhost/drinkshop/";
+    //In Emulator, localhost = 10.0.2.2
+    private static final String BASE_URL = "http://10.0.2.2/drinkshop/php/";
     
     //This one, will run **RetrofitClient** class and **getClient** function in this file.    
     private static IDrinkShopAPI getApi() {
@@ -487,6 +487,8 @@ public class Common {
 }
 
 ~~~~
+
+The BASE_URL of mine can be different from yours.
 
 ## Assets
 
@@ -548,4 +550,4 @@ In **values/colors.xml** change colors to:
 
 1. **colorPrimary** to **#d4e7e1**
 2. **colorPrimaryDark** to **#a3b6ae**
-3. **colorAccent** to **#1e1e1e*
+3. **colorAccent** to **#1e1e1e**
