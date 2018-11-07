@@ -74,4 +74,25 @@ class DB_Functions{
 		}else
 			return false;
 	}
+
+	/*
+	 * Get User Information
+	 * return User object if user was created
+	 * return false if user is not exists
+	 */
+	public function getUserInformation($phone) {
+
+		$stmt = $this->conn->prepare("SELECT * FROM User WHERE Phone=?");
+		$stmt->bind_param("s",$phone);
+
+		if($stmt->execute()) {
+
+			$user = $stmt->get_result()->fetch_assoc();
+			$stmt->close();
+
+			return $user;
+		}
+		else
+			return NULL;
+	}
 }

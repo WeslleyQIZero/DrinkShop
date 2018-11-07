@@ -46,50 +46,6 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    /*private void startLoginPage(String LoginType) {
-
-        startActivityForResult();
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        if(requestCode == REQUEST_CODE) {
-
-            final SpotsDialog alertDialog = new SpotsDialog(MainActivity.this);
-            alertDialog.show();
-            alertDialog.setMessage("Please waiting...");
-
-            final String phone = data.getDataString();
-
-            mService.checkUserExists(phone).enqueue(new Callback<CheckUserResponse>() {
-                @Override
-                public void onResponse(Call<CheckUserResponse> call, Response<CheckUserResponse> response) {
-
-                    CheckUserResponse userResponse = response.body();
-
-                    if(userResponse.isExists()) {
-
-                        //If User already exists, just start new Activity
-                        alertDialog.dismiss();
-                    }
-                    else {
-
-                        //Else, need register
-                        alertDialog.dismiss();
-                        showRegisterDialog(phone);
-                    }
-                }
-
-                @Override
-                public void onFailure(Call<CheckUserResponse> call, Throwable t) {
-
-                }
-            });
-        }
-    }*/
-
     private void showRegisterDialog() {
 
         final AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
@@ -156,6 +112,8 @@ public class MainActivity extends AppCompatActivity {
 
                             //If User already exists, just start new Activity
                             watingDialog.dismiss();
+                            startActivity(new Intent(MainActivity.this,HomeActivity.class));
+                            finish(); //will close this activity
                             Log.d("User","User is Existed");
                         }
                         else {
@@ -199,6 +157,10 @@ public class MainActivity extends AppCompatActivity {
                         if(TextUtils.isEmpty(user.getError_msg())) {
                             Toast.makeText(MainActivity.this,"User register succesfully",Toast.LENGTH_SHORT).show();
                             //Start new activity
+                            //Assign json result to currentUser
+                            Common.currentUser = response.body();
+                            startActivity(new Intent(MainActivity.this,HomeActivity.class));
+                            finish(); //will close this activity
                         }
                     }
 
