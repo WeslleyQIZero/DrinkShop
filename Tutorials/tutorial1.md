@@ -37,13 +37,13 @@ Then create a table called **user** and make sure that the table columns are loo
 
 | Name      | Type    | Length/Values |
 | --------- | ------- | ------------- |
-| Phone     | VARCHAR | 20            |
-| Name      | VARCHAR | 50            |
-| Birthdate | DATE    |               |
+| Id        | int     | 11            |
+| Name      | VARCHAR | 20            |
+| Surname   | VARCHAR | 20            |
 | Address   | TEXT    |               |
+| Email     | VARCHAR | 20            |
+| Password  | VARCHAR | 20            |
 
-
-Make sure that **Phone** column is a primary key but not autoincrement.
 
 ~~~~
 
@@ -114,6 +114,7 @@ Now, we are going to write some functions for our **db_connect.php**. So lets cr
 
 <?php
 
+
 class DB_Functions{
 
     private $conn;
@@ -134,14 +135,14 @@ class DB_Functions{
      * Check user exists
      * return true/false
      */
-    function checkExistsUser($phone)
+    function checkExistsUser($email)
     {   
 
         /* Because of we want to secure database, we are going to use **PDO** for PHP*/
 
         //The SQL statement as following will be executed whenever this function is called
-        $stmt = $this->conn->prepare("SELECT * FROM User WHERE Phone=?");
-        $stmt->bind_param("s",$phone); //"s" defines the parameter number,so if there was "ss" means two parameter mus be passed to this function (bind_param) which is PDO function
+        $stmt = $this->conn->prepare("SELECT * FROM User WHERE Email=?");
+        $stmt->bind_param("s",$email); //"s" defines the parameter number,so if there was "ss" means two parameter mus be passed to this function (bind_param) which is PDO function
         $stmt->execute(); //will execute this PDO function
         $stmt->store_result(); //the result will be stored as well
 
@@ -160,33 +161,53 @@ class DB_Functions{
      * return User object if user was created
      * return error message if have exception
      */
-    public function registerNewUser($phone,$name,$birthdate,$address)
+    public function registerNewUser($name,$surname,$address,$email,$password)
     {
         //The SQL statement as following will be executed whenever this function is called
-        $stmt = $this->conn->prepare("INSERT INTO User(Phone,Name,Birthday,Address) VALUES(?,?,?,?)");
-        $stmt->bind_param("ssss",$phone,$name,$birthdate,$address);
+        $stmt = $this->conn->prepare("INSERT INTO User(Name,Surname,Address,Email,Password) VALUES(?,?,?,?,?)");
+        $stmt->bind_param("sssss",$name,$surname,$address,$email,$password);
         $result = $stmt->execute();
         $stmt->store_result();
 
         if($result) {
-            $stmt = $this->conn->prepare("SELECT * FROM User WHERE Phone = ?");
-            $stmt->bind_param("s",$phone);
+            $stmt = $this->conn->prepare("SELECT * FROM User WHERE Email = ?");
+            $stmt->bind_param("s",$email);
             $stmt->execute();
             $user = $stmt->get_result()->fetch_assoc(); 
 
             /*fetch_assoc(); = we want to get all the information of the user like 
 
-              Phone: ....
               Name: .....
-              Birthday: ...
+              Surname: ...
               Address: ....
-
+              Email: ....
             */
 
             $stmt->close();
             return $user;
         }else
             return false;
+    }
+
+    /*
+     * Get User Information
+     * return User object if user was created
+     * return false if user is not exists
+     */
+    public function getUserInformation($email,$password) {
+
+        $stmt = $this->conn->prepare("SELECT * FROM User WHERE Email=? AND Password=?");
+        $stmt->bind_param("ss",$email,$password);
+
+        if($stmt->execute()) {
+
+            $user = $stmt->get_result()->fetch_assoc();
+            $stmt->close();
+
+            return $user;
+        }
+        else
+            return NULL;
     }
 }
 
@@ -206,15 +227,15 @@ Lets create a php file called **checkuser.php** to check whether the userphone i
     /*
      * Endpoint : https://<domain>/drinkshop/checkuser.php
      * Method : POST
-     * Params : phone
+     * Params : email
      * Result : JSON
      */
 
     $response = array();
-    if(isset($_POST['phone']))
+    if(isset($_POST['email']))
     {
-        $phone = $_POST['phone'];
-        if($db->checkExistsUser($phone)){
+        $email = $_POST['email'];
+        if($db->checkExistsUser($email)){
 
             $response["exists"] = TRUE;
             echo json_encode($response);
@@ -226,7 +247,7 @@ Lets create a php file called **checkuser.php** to check whether the userphone i
         }
     }
     else {
-        $response["error_msg"] = "Required parameter (phone) is missing!";
+        $response["error_msg"] = "Required parameter (email) is missing!";
         echo json_encode($response);
     }
 
@@ -287,31 +308,33 @@ Lets create a php file called **register.php** to check whether the userphone is
      */
 
     $response = array();
-    if(isset($_POST['phone']) &&
-       isset($_POST['name']) &&
-       isset($_POST['birthday']) &&
-       isset($_POST['address']))
+    if(isset($_POST['name']) &&
+       isset($_POST['surname']) &&
+       isset($_POST['address']) &&
+       isset($_POST['email']) &&
+       isset($_POST['password']))
     {
-        $phone = $_POST['phone'];
         $name = $_POST['name'];
-        $birthday = $_POST['birthday'];
+        $surname = $_POST['surname'];
         $address = $_POST['address'];
+        $email = $_POST['email'];
+        $password = $_POST['password'];
 
-        if($db->checkExistsUser($phone)){
+        if($db->checkExistsUser($email)){
 
-            $response["exists"] = "User already existed with ".$phone;
+            $response["exists"] = "User already existed with ".$email;
             echo json_encode($response);
 
         } else {
 
             //Create new user
-            $user = $db->registerNewUser($phone,$name,$birthday,$address);
+            $user = $db->registerNewUser($name,$surname,$address,$email,$password);
             if($user) {
 
-                $response["phone"] = $user["Phone"];
                 $response["name"] = $user["Name"];
-                $response["birthdate"] = $user["Birthdate"];
+                $response["surname"] = $user["Surname"];
                 $response["address"] = $user["Address"];
+                $response["email"] = $user["Email"];
                 echo json_encode($response);
             }else {
 
@@ -320,7 +343,7 @@ Lets create a php file called **register.php** to check whether the userphone is
         }
     }
     else {
-        $response["error_msg"] = "Required parameter (phone,name,birthdate,address) is missing!";
+        $response["error_msg"] = "Required parameter (name,surname,address,email,password) is missing!";
         echo json_encode($response);
     }
 
@@ -336,19 +359,13 @@ Lets create a class in the **app/com.example.username.projectname/Model** folder
 
 public class User {
 
-    private String phone;
-    private String address;
     private String name;
-    private String birthdate;
+    private String surname;
+    private String address;
+    private String email;
+    private String password;
     private String error_msg; //It will be empty if user return object
 
-    public String getPhone() {
-        return phone;
-    }
-
-    public void setPhone(String phone) {
-        this.phone = phone;
-    }
 
     public String getAddress() {
         return address;
@@ -366,12 +383,28 @@ public class User {
         this.name = name;
     }
 
-    public String getBirthdate() {
-        return birthdate;
+    public String getSurname() {
+        return surname;
     }
 
-    public void setBirthdate(String birthdate) {
-        this.birthdate = birthdate;
+    public void setSurname(String surname) {
+        this.surname = surname;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public String getError_msg() {
@@ -382,6 +415,7 @@ public class User {
         this.error_msg = error_msg;
     }
 }
+
 
 
 ~~~~
@@ -401,20 +435,19 @@ import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.POST;
 
-public abstract class IDrinkShopAPI {
-    
-    /* We will send **POST** request, so we have to encode the URL */
+public interface IDrinkShopAPI {
 
     @FormUrlEncoded
-    @POST("checkuser.php") //URL to send request            //Field will be send
-    abstract Call<CheckUserResponse> checkUserExists(@Field("phone") String phone);
+    @POST("checkuser.php")
+    Call<CheckUserResponse> checkUserExists(@Field("email") String phone);
 
     @FormUrlEncoded
     @POST("register.php")
-    abstract Call<User> registerNewUser(@Field("phone") String phone,
-                                        @Field("name") String name,
-                                        @Field("address") String address,
-                                        @Field("birthday") String birthdate);
+    Call<User> registerNewUser(@Field("name") String name,
+                               @Field("surname") String surname,
+                               @Field("address") String address,
+                               @Field("email") String email,
+                               @Field("password") String password);
 }
 
 ~~~~
@@ -449,7 +482,7 @@ public class RetrofitClient {
 
 ~~~~
 
-**Library Definition: **
+**Library Definition:**
 
 1.  GSON - [Link](https://github.com/google/gson)
 
@@ -518,25 +551,87 @@ Now, lets customize our **activity_main.xml** file for UI. So lets add the follo
 ~~~~
 
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/drink_shop_bg"
+    android:orientation="vertical"
     tools:context=".MainActivity">
 
-    <Button
-        android:id="@+id/btn_continue"
-        android:text="Continue"
-        android:background="@color/colorPrimaryDark"
-        android:layout_alignParentBottom="true"
+    <LinearLayout
+        android:background="@drawable/drink_shop_bg"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="390dp"
+        android:orientation="vertical">
 
-    <!-- android:layout_alignParentBottom="true" PUTS THE BUTTON TO THE BOTTOM -->
+        <TextView
+            android:layout_marginTop="35dp"
+            android:textAlignment="center"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="35sp"
+            android:textColor="@color/colorAccent"
+            android:text="Welcome to DrinkShop"/>
 
-</RelativeLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <com.rengwuxian.materialedittext.MaterialEditText
+            android:id="@+id/edt_email"
+            android:drawablePadding="10dp"
+            android:drawableLeft="@drawable/ic_person_outline_black_24dp"
+            android:layout_width="350dp"
+            android:layout_height="wrap_content"
+            android:hint="Email"
+            android:textSize="20sp"
+            android:textColor="@color/white"
+            app:met_floatingLabel="highlight"/>
+
+        <com.rengwuxian.materialedittext.MaterialEditText
+            android:id="@+id/edt_password"
+            android:layout_marginTop="10dp"
+            android:drawablePadding="10dp"
+            android:drawableLeft="@drawable/ic_lock_outline_black_24dp"
+            android:layout_width="350dp"
+            android:layout_height="wrap_content"
+            android:hint="Password"
+            android:textSize="20sp"
+            android:textColor="@color/white"
+            app:met_floatingLabel="highlight"/>
+
+            <Button
+                android:textSize="20sp"
+                android:layout_marginTop="10dp"
+                android:layout_marginLeft="25dp"
+                android:layout_marginRight="25dp"
+                android:id="@+id/btn_continue"
+                android:text="Login"
+                android:background="@color/colorPrimaryDark"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/black"/>
+
+            <TextView
+                android:clickable="true"
+                android:id="@+id/btn_register"
+                android:textColor="@color/black"
+                android:textSize="20sp"
+                android:layout_marginTop="20dp"
+                android:text="Don't have Account?"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+    </LinearLayout>
+
+<!-- android:layout_alignParentBottom="true" PUTS THE BUTTON TO THE BOTTOM -->
+
+</LinearLayout>
 
 ~~~~
 

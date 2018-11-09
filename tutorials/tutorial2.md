@@ -1,6 +1,6 @@
-# Register Account
+# Login & Register Account
 
-In this tutorial, we are going to learn how to add a functionality to the android app and make sure that users will be registered succesfully.
+In this tutorial, we are going to learn how to add a functionality to the android app and make sure that users will be registered succesfully and also can be logged in as well.
 
 ## Layout (register_layout.xml)
 
@@ -26,42 +26,66 @@ Then, add the following xml to it.
         
         <LinearLayout
             android:orientation="vertical"
-            android:layout_margin="16dp"
+            android:layout_margin="20dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
             <com.rengwuxian.materialedittext.MaterialEditText
-                android:id="@+id/edt_phone"
-                android:hint="Phone"
-                android:textSize="18sp"
-                android:inputType="text"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:met_floatingLabel="highlight"/>
-
-            <com.rengwuxian.materialedittext.MaterialEditText
+                app:met_minCharacters="2"
                 android:id="@+id/edt_name"
                 android:hint="Name"
-                android:textSize="18sp"
+                android:textSize="20sp"
                 android:inputType="text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:met_floatingLabel="highlight"/>
 
             <com.rengwuxian.materialedittext.MaterialEditText
+                app:met_minCharacters="2"
+                android:id="@+id/edt_surname"
+                android:hint="Surname"
+                android:textSize="20sp"
+                android:inputType="text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:met_floatingLabel="highlight"/>
+
+            <com.rengwuxian.materialedittext.MaterialEditText
+                app:met_minCharacters="10"
                 android:id="@+id/edt_address"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="Address"
                 android:inputType="text"
-                android:textSize="18sp"
+                android:textSize="20sp"
                 app:met_floatingLabel="highlight" />
 
             <com.rengwuxian.materialedittext.MaterialEditText
-                android:id="@+id/edt_birthday"
-                android:hint="Birthdate (YYYY-MM-DD)"
+                app:met_minCharacters="4"
+                android:id="@+id/edt_email"
+                android:hint="Email"
                 android:textSize="20sp"
-                android:digits="1234567890-"
+                android:inputType="textEmailAddress"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:met_floatingLabel="highlight"/>
+
+            <com.rengwuxian.materialedittext.MaterialEditText
+                app:met_minCharacters="8"
+                android:id="@+id/edt_password"
+                android:hint="Password"
+                android:textSize="20sp"
+                android:inputType="textPassword"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:met_floatingLabel="highlight"/>
+
+            <com.rengwuxian.materialedittext.MaterialEditText
+                app:met_minCharacters="8"
+                android:id="@+id/edt_confirm"
+                android:hint="Confirm Password"
+                android:textSize="20sp"
+                android:inputType="textPassword"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:met_floatingLabel="highlight"/>
@@ -69,6 +93,7 @@ Then, add the following xml to it.
         </LinearLayout>
 
         <Button
+            android:textSize="18sp"
             android:id="@+id/btn_register"
             android:text="Continue"
             android:background="@color/colorPrimaryDark"
@@ -90,6 +115,7 @@ Lets add the following lines to this file.
 ~~~~
 
     Button btn_continue;
+    TextView btn_register;
 
     IDrinkShopAPI mService;
 
@@ -99,12 +125,14 @@ Lets add the following lines to this file.
         setContentView(R.layout.activity_main);
 
         mService = Common.getAPI(); //will create a retrofit object, that we are going to use to send request to the our **BASE_URL**.
+        
+        ....
 
-        btn_continue = (Button)findViewById(R.id.btn_continue);
-        btn_continue.setOnClickListener(new View.OnClickListener() {
+        btn_register = (TextView)findViewById(R.id.btn_register);
+        btn_register.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                showRegisterDialog(); //will call the **showRegisterDialog()** function.
+                showRegisterDialog();
             }
         });
     }
@@ -115,13 +143,12 @@ Lets add the following lines to this file.
 
 In our **MainActivity** we have to create a function (method) called as **showRegisterDialog()** to show the **register** layout.
 
-Lets add the following function to this file.
+Lets add the following function to this class.
 
 ~~~~
 
     private void showRegisterDialog() {
-		
-		//We are going to create a alert builder which will be used to show alert dialog
+
         final AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
 
         //To Define Alert Dialog Title
@@ -130,22 +157,24 @@ Lets add the following function to this file.
         LayoutInflater inflater = this.getLayoutInflater();
         View register_layout = inflater.inflate(R.layout.register_layout, null);
 
-        final MaterialEditText edt_phone = (MaterialEditText)register_layout.findViewById(R.id.edt_phone);
         final MaterialEditText edt_name = (MaterialEditText)register_layout.findViewById(R.id.edt_name);
+        final MaterialEditText edt_surname = (MaterialEditText)register_layout.findViewById(R.id.edt_surname);
         final MaterialEditText edt_address = (MaterialEditText)register_layout.findViewById(R.id.edt_address);
-        final MaterialEditText edt_birthday = (MaterialEditText)register_layout.findViewById(R.id.edt_birthday);
+        final MaterialEditText edt_email = (MaterialEditText)register_layout.findViewById(R.id.edt_email);
+        final MaterialEditText edt_password = (MaterialEditText)register_layout.findViewById(R.id.edt_password);
+        final MaterialEditText edt_confirm = (MaterialEditText)register_layout.findViewById(R.id.edt_confirm);
 
         Button btn_register = (Button)register_layout.findViewById(R.id.btn_register);
 
-        edt_birthday.addTextChangedListener(new PatternedTextWatcher("####-##-##"));
+        //edt_birthday.addTextChangedListener(new PatternedTextWatcher("####-##-##"));
 
         builder.setView(register_layout);
         builder.show();
 
-        //To Create Alert Dialog object by using builder to create it
+        //To Create Alert Dialog object
         final AlertDialog dialog = builder.create();
 
-        //Event -> Whenever register button is clicked then this will be worked
+        //Event
         btn_register.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -153,32 +182,36 @@ Lets add the following function to this file.
                 //Will close it
                 dialog.dismiss();
 
-                if(TextUtils.isEmpty(edt_phone.getText().toString())) {
-                    Toast.makeText(MainActivity.this, "Please enter your phone", Toast.LENGTH_SHORT).show();
+                if(TextUtils.isEmpty(edt_name.getText().toString())) {
+                    Toast.makeText(MainActivity.this, "Please enter your Name", Toast.LENGTH_SHORT).show();
+                    return;
+                } else if(TextUtils.isEmpty(edt_surname.getText().toString())) {
+                    Toast.makeText(MainActivity.this,"Please enter your Surname",Toast.LENGTH_SHORT).show();
                     return;
                 } else if(TextUtils.isEmpty(edt_address.getText().toString())) {
-                    Toast.makeText(MainActivity.this,"Please enter your address",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this,"Please enter your Address",Toast.LENGTH_SHORT).show();
                     return;
-                } else if(TextUtils.isEmpty(edt_birthday.getText().toString())) {
-                    Toast.makeText(MainActivity.this,"Please enter your birthdate",Toast.LENGTH_SHORT).show();
+                } else if(TextUtils.isEmpty(edt_email.getText().toString())) {
+                    Toast.makeText(MainActivity.this,"Please enter your Email",Toast.LENGTH_SHORT).show();
                     return;
-                } else if(TextUtils.isEmpty(edt_name.getText().toString())) {
-                    Toast.makeText(MainActivity.this,"Please enter your name",Toast.LENGTH_SHORT).show();
+                } else if(TextUtils.isEmpty(edt_password.getText().toString())) {
+                    Toast.makeText(MainActivity.this,"Please enter your Password",Toast.LENGTH_SHORT).show();
+                    return;
+                } else if(TextUtils.isEmpty(edt_confirm.getText().toString())) {
+                    Toast.makeText(MainActivity.this,"Please confirm Password",Toast.LENGTH_SHORT).show();
                     return;
                 }
 
-                Log.d("Phone",edt_phone.toString());
-                Log.d("Name",edt_name.toString());
-                Log.d("Address",edt_address.toString());
-                Log.d("Birthday",edt_birthday.toString());
-				
-				//Will show Please waiting message 
+                if(!edt_password.getText().toString().equalsIgnoreCase(edt_confirm.getText().toString())){
+                    Toast.makeText(MainActivity.this, "Password & Confirm Password does not match",Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
                 final SpotsDialog watingDialog = new SpotsDialog(MainActivity.this);
                 watingDialog.show();
                 watingDialog.setMessage("Please waiting...");
-				
-				//will send a request to the url/checkuser.php with the parameters .php?phone
-                mService.checkUserExists(edt_phone.getText().toString()).enqueue(new Callback<CheckUserResponse>() {
+
+                mService.checkUserExists(edt_email.getText().toString()).enqueue(new Callback<CheckUserResponse>() {
                     @Override
                     public void onResponse(Call<CheckUserResponse> call, Response<CheckUserResponse> response) {
 
@@ -188,13 +221,12 @@ Lets add the following function to this file.
 
                             //If User already exists, just start new Activity
                             watingDialog.dismiss();
+                            Toast.makeText(MainActivity.this,"Email already is used",Toast.LENGTH_SHORT).show();
                             Log.d("User","User is Existed");
                         }
                         else {
                             Log.d("User","User is Not Existed. So, can create a new one");
-
-                            //If phone is not existed in the database, call the register function
-                            register(edt_phone.getText().toString(),edt_name.getText().toString(),edt_address.getText().toString(),edt_birthday.getText().toString());
+                            register(edt_name.getText().toString(),edt_surname.getText().toString(),edt_address.getText().toString(),edt_email.getText().toString(),edt_password.getText().toString());
                             watingDialog.dismiss();
                         }
                     }
@@ -214,6 +246,7 @@ Lets add the following function to this file.
         //dialog.show();
     }
 
+
 ~~~~
 
 ## Custom Function (Register)
@@ -224,27 +257,19 @@ So, lets add the following lines to **MainActivity** class.
 
 ~~~~
 
-    private void register(String phone, String name, String address, String birthday) {
+  private void register(String name, String surname, String address, String email, String password) {
 
-        Log.d("Phone",phone.toString());
+        /*Log.d("Phone",phone.toString());
         Log.d("Name",name.toString());
         Log.d("Address",address.toString());
-        Log.d("Birthday",birthday.toString());
+        Log.d("Birthday",birthday.toString());*/
 
-        mService.registerNewUser(phone,name,address,birthday)
+        mService.registerNewUser(name,surname,address,email,password)
                 .enqueue(new Callback<User>() {
                     @Override
                     public void onResponse(Call<User> call, Response<User> response) {
 
                         User user = response.body();
-
-                        //Log.d("User",user.getError_msg().toString());
-						
-						//If user.getError_msg() is empty that means we do not have any error, and we have created the user successfully.
-                        if(TextUtils.isEmpty(user.getError_msg())) {
-                            Toast.makeText(MainActivity.this,"User register succesfully",Toast.LENGTH_SHORT).show();
-                            //Start new activity
-                        }
                     }
 
                     @Override
@@ -254,7 +279,8 @@ So, lets add the following lines to **MainActivity** class.
         });
     }
 
+
 ~~~~
 
-Whenever this function is called, it will send request to the **url/register.php?phone=sameple&name=sample&address=sample&birthday=sample**. The response will be converted to the **User** object which means the **retrofit** automatically will convert the returned **JSON** to the model. This is one of the power of to use retrofit. Because we do not need to parse JSON.
+Whenever this function is called, it will send request to the **url/register.php**. The response will be converted to the **User** object which means the **retrofit** automatically will convert the **JSON** whatever returned to the model. This is one of the power of to use retrofit. Because of that we do not need to parse JSON.
 

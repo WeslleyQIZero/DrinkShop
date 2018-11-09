@@ -12,16 +12,18 @@ public interface IDrinkShopAPI {
 
     @FormUrlEncoded
     @POST("checkuser.php")
-    Call<CheckUserResponse> checkUserExists(@Field("phone") String phone);
+    Call<CheckUserResponse> checkUserExists(@Field("email") String phone);
 
     @FormUrlEncoded
     @POST("register.php")
-    Call<User> registerNewUser(@Field("phone") String phone,
-                               @Field("name") String name,
+    Call<User> registerNewUser(@Field("name") String name,
+                               @Field("surname") String surname,
                                @Field("address") String address,
-                               @Field("birthday") String birthdate);
+                               @Field("email") String email,
+                               @Field("password") String password);
 
     @FormUrlEncoded
     @POST("getuser.php")
-    Call<User> getUserInformation(@Field("phone") String phone);
+    Call<User> getUserInformation(@Field("email") String email,
+                                  @Field("password") String password);
 }

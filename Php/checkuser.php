@@ -6,15 +6,15 @@
 	/*
 	 * Endpoint : https://<domain>/drinkshop/checkuser.php
 	 * Method : POST
-	 * Params : phone
+	 * Params : email
 	 * Result : JSON
 	 */
 
 	$response = array();
-	if(isset($_POST['phone']))
+	if(isset($_POST['email']))
 	{
-		$phone = $_POST['phone'];
-		if($db->checkExistsUser($phone)){
+		$email = $_POST['email'];
+		if($db->checkExistsUser($email)){
 
 			$response["exists"] = TRUE;
 			echo json_encode($response);
@@ -26,7 +26,7 @@
 		}
 	}
 	else {
-		$response["error_msg"] = "Required parameter (phone) is missing!";
+		$response["error_msg"] = "Required parameter (email) is missing!";
 		echo json_encode($response);
 	}
 

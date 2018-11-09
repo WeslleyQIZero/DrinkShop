@@ -14,42 +14,66 @@
         
         <LinearLayout
             android:orientation="vertical"
-            android:layout_margin="16dp"
+            android:layout_margin="20dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
             <com.rengwuxian.materialedittext.MaterialEditText
-                android:id="@+id/edt_phone"
-                android:hint="Phone"
-                android:textSize="18sp"
-                android:inputType="text"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:met_floatingLabel="highlight"/>
-
-            <com.rengwuxian.materialedittext.MaterialEditText
+                app:met_minCharacters="2"
                 android:id="@+id/edt_name"
                 android:hint="Name"
-                android:textSize="18sp"
+                android:textSize="20sp"
                 android:inputType="text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:met_floatingLabel="highlight"/>
 
             <com.rengwuxian.materialedittext.MaterialEditText
+                app:met_minCharacters="2"
+                android:id="@+id/edt_surname"
+                android:hint="Surname"
+                android:textSize="20sp"
+                android:inputType="text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:met_floatingLabel="highlight"/>
+
+            <com.rengwuxian.materialedittext.MaterialEditText
+                app:met_minCharacters="10"
                 android:id="@+id/edt_address"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="Address"
                 android:inputType="text"
-                android:textSize="18sp"
+                android:textSize="20sp"
                 app:met_floatingLabel="highlight" />
 
             <com.rengwuxian.materialedittext.MaterialEditText
-                android:id="@+id/edt_birthday"
-                android:hint="Birthdate (YYYY-MM-DD)"
+                app:met_minCharacters="4"
+                android:id="@+id/edt_email"
+                android:hint="Email"
                 android:textSize="20sp"
-                android:digits="1234567890-"
+                android:inputType="textEmailAddress"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:met_floatingLabel="highlight"/>
+
+            <com.rengwuxian.materialedittext.MaterialEditText
+                app:met_minCharacters="8"
+                android:id="@+id/edt_password"
+                android:hint="Password"
+                android:textSize="20sp"
+                android:inputType="textPassword"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:met_floatingLabel="highlight"/>
+
+            <com.rengwuxian.materialedittext.MaterialEditText
+                app:met_minCharacters="8"
+                android:id="@+id/edt_confirm"
+                android:hint="Confirm Password"
+                android:textSize="20sp"
+                android:inputType="textPassword"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:met_floatingLabel="highlight"/>
@@ -57,6 +81,7 @@
         </LinearLayout>
 
         <Button
+            android:textSize="18sp"
             android:id="@+id/btn_register"
             android:text="Continue"
             android:background="@color/colorPrimaryDark"

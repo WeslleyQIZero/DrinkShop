@@ -6,23 +6,24 @@
 	/*
 	 * Endpoint : https://<domain>/drinkshop/getuser.php
 	 * Method : POST
-	 * Params : phone
+	 * Params : email
 	 * Result : JSON
 	 */
 
 	$response = array();
-	if(isset($_POST['phone']))
+	if(isset($_POST['email']) && isset($_POST['password']))
 	{
-		$phone = $_POST['phone'];
+		$email = $_POST['email'];
+		$password = $_POST['password'];
 
 			//Create new user
-		$user = $db->getUserInformation($phone);
+		$user = $db->getUserInformation($email,$password);
 		if($user) {
 
-			$response["phone"] = $user["Phone"];
 			$response["name"] = $user["Name"];
-			$response["birthdate"] = $user["Birthdate"];
+			$response["surname"] = $user["Surname"];
 			$response["address"] = $user["Address"];
+			$response["email"] = $user["Email"];
 			echo json_encode($response);
 		}else {
 
@@ -31,7 +32,7 @@
 		}
 	}
 	else {
-		$response["error_msg"] = "Required parameter (phone,name,birthdate,address) is missing!";
+		$response["error_msg"] = "Required parameter (email,password) is missing!";
 		echo json_encode($response);
 	}
 

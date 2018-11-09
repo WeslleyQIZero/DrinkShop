@@ -19,7 +19,7 @@ import com.example.olgun.drinkshop.Utils.Common;
 public class HomeActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
-    TextView txt_name, txt_phone;
+    TextView txt_name, txt_email;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,11 +49,11 @@ public class HomeActivity extends AppCompatActivity
         //Don't know what is this
         View headerView = navigationView.getHeaderView(0);
         txt_name = (TextView) headerView.findViewById(R.id.txt_name);
-        txt_phone = (TextView) headerView.findViewById(R.id.txt_phone);
+        txt_email = (TextView) headerView.findViewById(R.id.txt_email);
 
         //Set Info - get info from Common class because User object is static there
-        txt_name.setText(Common.currentUser.getName());
-        txt_phone.setText(Common.currentUser.getPhone());
+        txt_name.setText(Common.currentUser.getName() + " " + Common.currentUser.getSurname());
+        txt_email.setText(Common.currentUser.getEmail());
     }
 
     @Override

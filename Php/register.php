@@ -11,31 +11,33 @@
 	 */
 
 	$response = array();
-	if(isset($_POST['phone']) &&
-	   isset($_POST['name']) &&
-	   isset($_POST['birthday']) &&
-	   isset($_POST['address']))
+	if(isset($_POST['name']) &&
+	   isset($_POST['surname']) &&
+	   isset($_POST['address']) &&
+	   isset($_POST['email']) &&
+	   isset($_POST['password']))
 	{
-		$phone = $_POST['phone'];
 		$name = $_POST['name'];
-		$birthday = $_POST['birthday'];
+		$surname = $_POST['surname'];
 		$address = $_POST['address'];
+		$email = $_POST['email'];
+		$password = $_POST['password'];
 
-		if($db->checkExistsUser($phone)){
+		if($db->checkExistsUser($email)){
 
-			$response["exists"] = "User already existed with ".$phone;
+			$response["exists"] = "User already existed with ".$email;
 			echo json_encode($response);
 
 		} else {
 
 			//Create new user
-			$user = $db->registerNewUser($phone,$name,$birthday,$address);
+			$user = $db->registerNewUser($name,$surname,$address,$email,$password);
 			if($user) {
 
-				$response["phone"] = $user["Phone"];
 				$response["name"] = $user["Name"];
-				$response["birthdate"] = $user["Birthdate"];
+				$response["surname"] = $user["Surname"];
 				$response["address"] = $user["Address"];
+				$response["email"] = $user["Email"];
 				echo json_encode($response);
 			}else {
 
@@ -44,7 +46,7 @@
 		}
 	}
 	else {
-		$response["error_msg"] = "Required parameter (phone,name,birthdate,address) is missing!";
+		$response["error_msg"] = "Required parameter (name,surname,address,email,password) is missing!";
 		echo json_encode($response);
 	}
 

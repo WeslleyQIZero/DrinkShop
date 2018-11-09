@@ -51,7 +51,7 @@ So lets add the following lines to this file.
 
 ~~~~
 
-Because of that **User** object or lets say variable is **static** we will be accessed to from anywhere in the application.
+Because of that **User** object (variable) is **static** we will be able to access to it from anywhere in the application.
 
 ## HomeActivity - Get User Information
 
@@ -75,7 +75,7 @@ In the **HomeActivity** class to ge the **currentUser** informations add the fol
 
         //Set Info - get info from Common class because User object is static there
         txt_name.setText(Common.currentUser.getName());
-        txt_phone.setText(Common.currentUser.getPhone());
+        txt_phone.setText(Common.currentUser.getEmail());
     }
 
 ~~~~
@@ -138,7 +138,7 @@ So lets add the following lines to this file.
         android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
 
     <TextView
-        android:id="@+id/txt_phone" //new line
+        android:id="@+id/text_email" //new line
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/nav_header_subtitle" />
@@ -156,102 +156,6 @@ So, lets add the following lines to this file.
     <color name="navBackground">#55d4e7e1</color>
 
 ~~~~
-
-## PHP - Custom Function (getUserInformation) 
-
-Now, we have to create a function in the **db_functions.php** file to get the user information. But we are going to use this function later.
-
-So, lets add the following function to this file.
-
-~~~~
-
-	/*
-	 * Get User Information
-	 * return User object if user was created
-	 * return false if user is not exists
-	 */
-	public function getUserInformation($phone) {
-
-		$stmt = $this->conn->prepare("SELECT * FROM User WHERE Phone=?");
-		$stmt->bind_param("s",$phone);
-
-		if($stmt->execute()) {
-
-			$user = $stmt->get_result()->fetch_assoc();
-			$stmt->close();
-
-			return $user;
-		}
-		else
-			return NULL;
-	}
-
-~~~~
-
-## PHP - Another File (getuser.php)
-
-Now, lets create another file in our **PHP** folder as called as **getuser.php** to get the user informations.
-
-After you've created this file, add the following lines.
-
-~~~~
-
-<?php
-
-	require_once 'db_functions.php';
-	$db = new DB_Functions();
-
-	/*
-	 * Endpoint : https://<domain>/drinkshop/getuser.php
-	 * Method : POST
-	 * Params : phone
-	 * Result : JSON
-	 */
-
-	$response = array();
-	if(isset($_POST['phone']))
-	{
-		$phone = $_POST['phone'];
-
-			//Create new user
-		$user = $db->getUserInformation($phone);
-		if($user) {
-
-			$response["phone"] = $user["Phone"];
-			$response["name"] = $user["Name"];
-			$response["birthdate"] = $user["Birthdate"];
-			$response["address"] = $user["Address"];
-			echo json_encode($response);
-		}else {
-
-			$response["error_msg"] = "User does not exist";
-			echo json_encode($response);
-		}
-	}
-	else {
-		$response["error_msg"] = "Required parameter (phone,name,birthdate,address) is missing!";
-		echo json_encode($response);
-	}
-
-?>
-
-~~~~
-
-## New API - IDrinkShopAPI
-
-In the **IDrinkShopAPI** interface, we have to add another api method to make sure that we can send request to get the user informations.
-
-So lets add the following lines to this interface.
-
-~~~~
-
-    @FormUrlEncoded
-    @POST("getuser.php")
-    Call<User> getUserInformation(@Field("phone") String phone);
-
-~~~~
-
-This method means that, the request will be sent to the **BASE_URL/getuser.php** as **POST** http method with **phone** field and the response **JSON** will be converted to the **User** object.
 
 
 
